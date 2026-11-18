@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encuesta de Retroalimentación - Matemáticas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-p-4 flex flex-col min-h-screen">
+
+    <div class="max-w-2xl mx-auto w-full p-4 sm:p-6 my-8 bg-white shadow-md rounded-xl border border-slate-100">
+        
+        <!-- ENCABEZADO -->
+        <header class="border-b pb-4 mb-6">
+            <h1 class="text-2xl font-bold text-slate-900 text-center">Evaluación de la Dinámica y Materiales</h1>
+            <p class="text-sm text-slate-500 text-center mt-1">Asignatura: Matemáticas | Caracas, Venezuela</p>
+            <div class="mt-4 p-3 bg-amber-50 border border-amber-200 text-amber-800 text-xs rounded-lg">
+                <strong>Nota de anonimato:</strong> Esta encuesta no solicita nombres ni datos personales. Tus respuestas son totalmente confidenciales.
+            </div>
+        </header>
+
+        <!-- FORMULARIO -->
+        <div id="survey-container">
+            <!-- PASO 1: IDENTIFICACIÓN ANÓNIMA -->
+            <div id="step-id" class="space-y-4">
+                <h2 class="font-semibold text-lg text-slate-700">1. Datos Generales de la Sección</h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-600 mb-1">Año de Bachillerato:</label>
+                        <select id="input-ano" class="w-full p-2.5 border rounded-lg bg-slate-50 text-sm">
+                            <option value="3ero">3ero Año</option>
+                            <option value="4to">4to Año</option>
+                            <option value="5to">5to Año</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-600 mb-1">Sección:</label>
+                        <input type="text" id="input-seccion" placeholder="Ej. A, B, U..." class="w-full p-2.5 border rounded-lg bg-slate-50 text-sm uppercase" required>
+                    </div>
+                </div>
+                <button onclick="startSurvey()" class="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg transition">Comenzar Encuesta</button>
+            </div>
+
+            <!-- PASO 2: PREGUNTAS -->
+            <div id="step-questions" class="hidden space-y-6">
+                <!-- Pregunta 1 -->
+                <div class="space-y-2">
+                    <label class="font-medium text-slate-900 block">1. Utilidad de las guías pedagógicas entregadas con 15 días de anticipación:</label>
+                    <div class="space-y-2 text-sm">
+                        <label class="flex items-start gap-2 p-2 border rounded-lg hover:bg-slate-50 cursor-pointer"><input type="radio" name="p1" value="4" class="mt-1"> Excelente: Me sirvieron de guía completa y entendí muy bien los ejemplos.</label>
+                        <label class="flex items-start gap-2 p-2 border rounded-lg hover:bg-slate-50 cursor-pointer"><input type="radio" name="p1" value="3" class="mt-1"> Buenos, con limitaciones: Algunos ejercicios avanzados costaron más por tiempo.</label>
+                        <label class="flex items-start gap-2 p-2 border rounded-lg hover:bg-slate-50 cursor-pointer"><input type="radio" name="p1" value="2" class="mt-1"> Regulares: El material es denso o costó comprenderlo sin explicación.</label>
+                        <label class="flex items-start gap-2 p-2 border rounded-lg hover:bg-slate-50 cursor-pointer"><input type="radio" name="p1" value="1" class="mt-1"> Básicos pero aprovechables: Pude rescatar definiciones y ejemplos sencillos.</label>
+                    </div>
+                </div>
+
+                <!-- Pregunta 2 -->
+                <div class="space-y-2">
+                    <label class="font-medium text-slate-900 block">2. Dinámica de explicación y desarrollo de contenidos en clase:</label>
+                    <div class="space-y-2 text-sm">
+                        <label class="flex items-start gap-2 p-2 border rounded-lg hover:bg-slate-50 cursor-pointer"><input type="radio" name="p2" value="4" class="mt-1"> Muy adecuada: Explicaciones paso a paso y ejercicios clave en pizarra.</label>
+                        <label class="flex items-start gap-2 p-2 border rounded-lg hover:bg-slate-50 cursor-pointer"><input type="radio" name="p2" value="3" class="mt-1"> Adecuada, aunque el tiempo afectó: No se abarcó el 100% de lo planeado.</label>
+                        <label class="flex items-start gap-2 p-2 border rounded-lg hover:bg-slate-50 cursor-pointer"><input type="radio" name="p2" value="2" class="mt-1"> Poco efectiva: Ritmo rápido y dificultad para seguir procedimientos.</label>
+                        <label class="flex items-start gap-2 p-2 border rounded-lg hover:bg-slate-50 cursor-pointer"><input type="radio" name="p2" value="1" class="mt-1"> Con poco alcance, pero orientadora: Sirvió de punto de partida mínimo.</label>
+                    </div>
+                </div>
+
+                <!-- Pregunta 3 -->
+                <div class="space-y-2">
+                    <label class="font-medium text-slate-900 block">3. Claridad de instrucciones y evaluación exclusiva de lo visto en clases:</label>
+                    <div class="space-y-2 text-sm">
+                        <label class="flex items-start gap-2 p-2 border rounded-lg hover:bg-slate-50 cursor-pointer"><input type="radio" name="p3" value="4" class="mt-1"> Muy claros: Tranquilidad porque no salió nada ajeno a lo practicado.</label>
+                        <label class="flex items-start gap-2 p-2 border rounded-lg hover:bg-slate-50 cursor-pointer"><input type="radio" name="p3" value="3" class="mt-1"> Claros en general: Entendí la dinámica aunque con dudas puntuales de notas.</label>
+                        <label class="flex items-start gap-2 p-2 border rounded-lg hover:bg-slate-50 cursor-pointer"><input type="radio" name="p3" value="2" class="mt-1"> Poco claros: La información inicial no resultó completamente transparente.</label>
+                        <label class="flex items-start gap-2 p-2 border rounded-lg hover:bg-slate-50 cursor-pointer"><input type="radio" name="p3" value="1" class="mt-1"> Confusas al inicio, pero mejorables: Con el tiempo comprendí la evaluación.</label>
+                    </div>
+                </div>
+
+                <!-- Comentario libre -->
+                <div>
+                    <label class="block text-sm font-medium text-slate-600 mb-1">Comentarios o sugerencias adicionales (Opcional):</label>
+                    <textarea id="input-comentario" rows="2" class="w-full p-2.5 border rounded-lg text-sm bg-slate-50" placeholder="Escribe aquí tus recomendaciones..."></textarea>
+                </div>
+
+                <button onclick="submitSurvey()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 rounded-lg transition">Enviar Respuestas</button>
+            </div>
+
+            <!-- PASO 3: AGRADECIMIENTO -->
+            <div id="step-thanks" class="hidden text-center py-8 space-y-4">
+                <div class="text-emerald-600 text-5xl">✓</div>
+                <h2 class="text-xl font-bold text-slate-800">¡Gracias por participar!</h2>
+                <p class="text-sm text-slate-600">Tus respuestas han sido registradas de forma completamente anónima para seguir mejorando las clases.</p>
+                <button onclick="resetSurvey()" class="text-blue-600 hover:underline text-sm font-medium">Completar otra respuesta</button>
+            </div>
+        </div>
+
+        <!-- PANEL DE PROFESOR (ACCESIBLE PARA EL DOCENTE) -->
+        <div class="mt-12 border-t pt-6">
+            <button onclick="toggleTeacherPanel()" class="text-xs text-slate-400 hover:text-slate-600 underline">Panel de Profesor (Ver Informe Consolidado)</button>
+            
+            <div id="teacher-panel" class="hidden mt-4 p-4 bg-slate-100 rounded-lg text-xs space-y-4">
+                <h3 class="font-bold text-slate-700 text-sm">Resumen y Sugerencias Automáticas</h3>
+                <div id="stats-content" class="space-y-2 text-slate-600">
+                    <!-- Dinámico -->
+                </div>
+                <button onclick="clearData()" class="text-red-500 hover:underline mt-2">Reiniciar datos almacenados</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let currentAno = '';
+        let currentSeccion = '';
+
+        function startSurvey() {
+            currentAno = document.getElementById('input-ano').value;
+            currentSeccion = document.getElementById('input-seccion').value.trim();
+            if(!currentSeccion) {
+                alert('Por favor, indica la sección.');
+                return;
+            }
+            document.getElementById('step-id').classList.add('hidden');
+            document.getElementById('step-questions').classList.remove('hidden');
+        }
+
+        function submitSurvey() {
+            const p1 = document.querySelector('input[name="p1"]:checked');
+            const p2 = document.querySelector('input[name="p2"]:checked');
+            const p3 = document.querySelector('input[name="p3"]:checked');
+            const comentario = document.getElementById('input-comentario').value;
+
+            if(!p1 || !p2 || !p3) {
+                alert('Por favor responde las 3 preguntas principales antes de enviar.');
+                return;
+            }
+
+            let responses = JSON.parse(localStorage.getItem('math_survey_responses') || '[]');
+            responses.push({
+                ano: currentAno,
+                seccion: currentSeccion,
+                p1: parseInt(p1.value),
+                p2: parseInt(p2.value),
+                p3: parseInt(p3.value),
+                comentario: comentario,
+                fecha: new Date().toLocaleDateString()
+            });
+            localStorage.setItem('math_survey_responses', JSON.stringify(responses));
+
+            document.getElementById('step-questions').classList.add('hidden');
+            document.getElementById('step-thanks').classList.remove('hidden');
+        }
+
+        function resetSurvey() {
+            document.querySelectorAll('input[type="radio"]').forEach(el => el.checked = false);
+            document.getElementById('input-comentario').value = '';
+            document.getElementById('input-seccion').value = '';
+            document.getElementById('step-thanks').classList.add('hidden');
+            document.getElementById('step-id').classList.remove('hidden');
+        }
+
+        function toggleTeacherPanel() {
+            const panel = document.getElementById('teacher-panel');
+            panel.classList.toggle('hidden');
+            if(!panel.classList.contains('hidden')) {
+                generateReport();
+            }
+        }
+
+        function generateReport() {
+            let responses = JSON.parse(localStorage.getItem('math_survey_responses') || '[]');
+            let container = document.getElementById('stats-content');
+            
+            if(responses.length === 0) {
+                container.innerHTML = '<p>Aún no hay respuestas registradas en este navegador.</p>';
+                return;
+            }
+
+            let total = responses.length;
+            let avgP1 = (responses.reduce((acc, curr) => acc + curr.p1, 0) / total).toFixed(1);
+            let avgP2 = (responses.reduce((acc, curr) => acc + curr.p2, 0) / total).toFixed(1);
+            let avgP3 = (responses.reduce((acc, curr) => acc + curr.p3, 0) / total).toFixed(1);
+
+            let sugerencia = "";
+            if (avgP2 < 2.5) {
+                sugerencia = "Sugerencia: Reforzar las sesiones prácticas en clase y reajustar la cantidad de temas teóricos para evitar saturación por tiempos cortos.";
+            } else {
+                sugerencia = "Sugerencia: La dinámica actual muestra buena aceptación. Mantener la anticipación de guías y consolidar espacios para aplicaciones prácticas faltantes.";
+            }
+
+            let html = `
+                <p><strong>Total de encuestas procesadas:</strong> ${total}</p>
+                <p><strong>Promedio Materiales (P1):</strong> ${avgP1} / 4.0</p>
+                <p><strong>Promedio Metodología/Clases (P2):</strong> ${avgP2} / 4.0</p>
+                <p><strong>Promedio Criterios/Claridad (P3):</strong> ${avgP3} / 4.0</p>
+                <div class="p-2 bg-blue-50 border border-blue-200 text-blue-900 rounded mt-2">
+                    <strong>Informe Automático:</strong><br>${sugerencia}
+                </div>
+            `;
+            container.innerHTML = html;
+        }
+
+        function clearData() {
+            if(confirm('¿Deseas borrar los datos locales de prueba?')) {
+                localStorage.removeItem('math_survey_responses');
+                generateReport();
+            }
+        }
+    </script>
+</body>
+</html>
