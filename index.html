@@ -50,7 +50,7 @@
                         <label class="flex items-start gap-2 p-2 border rounded-lg hover:bg-slate-50 cursor-pointer"><input type="radio" name="p1" value="4" class="mt-1"> Excelente: Me sirvieron de guía completa y entendí muy bien los ejemplos.</label>
                         <label class="flex items-start gap-2 p-2 border rounded-lg hover:bg-slate-50 cursor-pointer"><input type="radio" name="p1" value="3" class="mt-1"> Buenos, con limitaciones: Algunos ejercicios avanzados costaron más por tiempo.</label>
                         <label class="flex items-start gap-2 p-2 border rounded-lg hover:bg-slate-50 cursor-pointer"><input type="radio" name="p1" value="2" class="mt-1"> Regulares: El material es denso o costó comprenderlo sin explicación.</label>
-                        <label class="flex items-start gap-2 p-2 border rounded-lg hover:bg-slate-50 cursor-pointer"><input type="radio" name="p1" value="1" class="mt-1"> Básicos pero aprovechables: Pude rescatar definiciones y ejemplos sencillos.</label>
+                        <label class="flex items-start gap-2 p-2 border rounded-lg hover:bg-slate-50 cursor-pointer"><input type="radio" name="p1" value="1" class="mt-1"> Básicos pero aprovechables: Pude rescatar algunas definiciones y ejemplos sencillos.</label>
                     </div>
                 </div>
 
@@ -82,7 +82,7 @@
                     <textarea id="input-comentario" rows="2" class="w-full p-2.5 border rounded-lg text-sm bg-slate-50" placeholder="Escribe aquí tus recomendaciones..."></textarea>
                 </div>
 
-                <button onclick="submitSurvey()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 rounded-lg transition">Enviar Respuestas</button>
+                <button id="btn-submit" onclick="submitSurvey()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 rounded-lg transition">Enviar Respuestas</button>
             </div>
 
             <!-- PASO 3: AGRADECIMIENTO -->
@@ -94,28 +94,17 @@
             </div>
         </div>
 
-        <!-- PANEL DE PROFESOR (ACCESIBLE PARA EL DOCENTE) -->
-        <div class="mt-12 border-t pt-6">
-            <button onclick="toggleTeacherPanel()" class="text-xs text-slate-400 hover:text-slate-600 underline">Panel de Profesor (Ver Informe Consolidado)</button>
-            
-            <div id="teacher-panel" class="hidden mt-4 p-4 bg-slate-100 rounded-lg text-xs space-y-4">
-                <h3 class="font-bold text-slate-700 text-sm">Resumen y Sugerencias Automáticas</h3>
-                <div id="stats-content" class="space-y-2 text-slate-600">
-                    <!-- Dinámico -->
-                </div>
-                <button onclick="clearData()" class="text-red-500 hover:underline mt-2">Reiniciar datos almacenados</button>
-            </div>
-        </div>
-
     </div>
 
     <script>
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby9XcHWXPGNQmuWvcjP0TGYW0JLHZn9Stbynj3BlUMU4MCER1CM_Mdqshzw2IAzDThHWQ/exec';
+
         let currentAno = '';
         let currentSeccion = '';
 
         function startSurvey() {
             currentAno = document.getElementById('input-ano').value;
-            currentSeccion = document.getElementById('input-seccion').value.trim();
+            currentSeccion = document.getElementById('input-seccion').value.trim().toUpperCase();
             if(!currentSeccion) {
                 alert('Por favor, indica la sección.');
                 return;
@@ -128,27 +117,45 @@
             const p1 = document.querySelector('input[name="p1"]:checked');
             const p2 = document.querySelector('input[name="p2"]:checked');
             const p3 = document.querySelector('input[name="p3"]:checked');
-            const comentario = document.getElementById('input-comentario').value;
+            const comentario = document.getElementById('input-comentario').value.trim();
 
             if(!p1 || !p2 || !p3) {
                 alert('Por favor responde las 3 preguntas principales antes de enviar.');
                 return;
             }
 
-            let responses = JSON.parse(localStorage.getItem('math_survey_responses') || '[]');
-            responses.push({
+            const btn = document.getElementById('btn-submit');
+            btn.disabled = true;
+            btn.textContent = 'Enviando respuestas...';
+
+            const payload = {
                 ano: currentAno,
                 seccion: currentSeccion,
                 p1: parseInt(p1.value),
                 p2: parseInt(p2.value),
                 p3: parseInt(p3.value),
-                comentario: comentario,
-                fecha: new Date().toLocaleDateString()
-            });
-            localStorage.setItem('math_survey_responses', JSON.stringify(responses));
+                comentario: comentario || 'Sin comentarios'
+            };
 
-            document.getElementById('step-questions').classList.add('hidden');
-            document.getElementById('step-thanks').classList.remove('hidden');
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(() => {
+                document.getElementById('step-questions').classList.add('hidden');
+                document.getElementById('step-thanks').classList.remove('hidden');
+                btn.disabled = false;
+                btn.textContent = 'Enviar Respuestas';
+            })
+            .catch(error => {
+                alert('Hubo un problema de conexión. Por favor intenta de nuevo.');
+                btn.disabled = false;
+                btn.textContent = 'Enviar Respuestas';
+            });
         }
 
         function resetSurvey() {
@@ -157,54 +164,6 @@
             document.getElementById('input-seccion').value = '';
             document.getElementById('step-thanks').classList.add('hidden');
             document.getElementById('step-id').classList.remove('hidden');
-        }
-
-        function toggleTeacherPanel() {
-            const panel = document.getElementById('teacher-panel');
-            panel.classList.toggle('hidden');
-            if(!panel.classList.contains('hidden')) {
-                generateReport();
-            }
-        }
-
-        function generateReport() {
-            let responses = JSON.parse(localStorage.getItem('math_survey_responses') || '[]');
-            let container = document.getElementById('stats-content');
-            
-            if(responses.length === 0) {
-                container.innerHTML = '<p>Aún no hay respuestas registradas en este navegador.</p>';
-                return;
-            }
-
-            let total = responses.length;
-            let avgP1 = (responses.reduce((acc, curr) => acc + curr.p1, 0) / total).toFixed(1);
-            let avgP2 = (responses.reduce((acc, curr) => acc + curr.p2, 0) / total).toFixed(1);
-            let avgP3 = (responses.reduce((acc, curr) => acc + curr.p3, 0) / total).toFixed(1);
-
-            let sugerencia = "";
-            if (avgP2 < 2.5) {
-                sugerencia = "Sugerencia: Reforzar las sesiones prácticas en clase y reajustar la cantidad de temas teóricos para evitar saturación por tiempos cortos.";
-            } else {
-                sugerencia = "Sugerencia: La dinámica actual muestra buena aceptación. Mantener la anticipación de guías y consolidar espacios para aplicaciones prácticas faltantes.";
-            }
-
-            let html = `
-                <p><strong>Total de encuestas procesadas:</strong> ${total}</p>
-                <p><strong>Promedio Materiales (P1):</strong> ${avgP1} / 4.0</p>
-                <p><strong>Promedio Metodología/Clases (P2):</strong> ${avgP2} / 4.0</p>
-                <p><strong>Promedio Criterios/Claridad (P3):</strong> ${avgP3} / 4.0</p>
-                <div class="p-2 bg-blue-50 border border-blue-200 text-blue-900 rounded mt-2">
-                    <strong>Informe Automático:</strong><br>${sugerencia}
-                </div>
-            `;
-            container.innerHTML = html;
-        }
-
-        function clearData() {
-            if(confirm('¿Deseas borrar los datos locales de prueba?')) {
-                localStorage.removeItem('math_survey_responses');
-                generateReport();
-            }
         }
     </script>
 </body>
